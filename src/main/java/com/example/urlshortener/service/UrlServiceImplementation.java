@@ -2,7 +2,11 @@ package com.example.urlshortener.service;
 
 import com.example.urlshortener.exception.ShortUrlNotFoundException;
 import com.example.urlshortener.repository.UrlRecordRepository;
+import com.example.urlshortener.util.ExpiryDuration;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class UrlServiceImplementation implements UrlService {
@@ -28,7 +32,7 @@ public class UrlServiceImplementation implements UrlService {
     }
 
     @Override
-    public String shortenUrl(String originalUrl) {
+    public String shortenUrl(String originalUrl, ExpiryDuration duration) {
 
         // If URL already exists
         var existingUrl = urlRecordRepository.findByOriginalUrl(originalUrl);
@@ -45,6 +49,7 @@ public class UrlServiceImplementation implements UrlService {
                 .shortCode(shortCode)
                 .createdAt(java.time.LocalDateTime.now())
                 .clickCount(0L)
+                .expiresAt(calculateExpiry(duration))
                 .build();
 
         urlRecordRepository.save(urlRecord);
@@ -63,9 +68,24 @@ public class UrlServiceImplementation implements UrlService {
 
         var record = recordOptional.get();
 
+        if (record.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Short URL has expired");
+        }
+
         // Increment the click count
         record.setClickCount(record.getClickCount() + 1);
         urlRecordRepository.save(record);
         return record.getOriginalUrl();
+    }
+
+    private LocalDateTime calculateExpiry(com.example.urlshortener.util.ExpiryDuration duration) {
+        LocalDateTime now = LocalDateTime.now();
+
+        return switch (duration) {
+            case ONE_HOUR ->  now.plusHours(1);
+            case ONE_DAY -> now.plusDays(1);
+            case SEVEN_DAYS -> now.plusDays(7);
+            case THIRTY_DAYS -> now.plusDays(30);
+        };
     }
 }

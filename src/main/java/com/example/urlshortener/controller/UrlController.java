@@ -26,7 +26,10 @@ public class UrlController {
     @PostMapping("/shorten")
     public ResponseEntity<UrlResponse> shortenUrl(@Valid @RequestBody UrlRequest request) {
 
-        String shortCode = urlService.shortenUrl(request.getOriginalUrl());
+        String shortCode = urlService.shortenUrl(
+                request.getOriginalUrl(),
+                request.getExpiryDuration()
+        );
 
         String shortUrl = "http://localhost:8081/" + shortCode;
 
