@@ -30,4 +30,6 @@ public class UrlRecord {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "click_count", nullable = false)
+    private Long clickCount = 0L;
 }

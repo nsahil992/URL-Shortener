@@ -44,6 +44,7 @@ public class UrlServiceImplementation implements UrlService {
                 .originalUrl(originalUrl)
                 .shortCode(shortCode)
                 .createdAt(java.time.LocalDateTime.now())
+                .clickCount(0L)
                 .build();
 
         urlRecordRepository.save(urlRecord);
@@ -54,12 +55,17 @@ public class UrlServiceImplementation implements UrlService {
     @Override
     public String getOriginalUrl(String shortCode) {
 
-        var record = urlRecordRepository.findByShortCode(shortCode);
+        var recordOptional = urlRecordRepository.findByShortCode(shortCode);
 
-        if (record.isEmpty()) {
+        if (recordOptional.isEmpty()) {
             throw new ShortUrlNotFoundException("Short URL not found");
         }
 
-        return record.get().getOriginalUrl();
+        var record = recordOptional.get();
+
+        // Increment the click count
+        record.setClickCount(record.getClickCount() + 1);
+        urlRecordRepository.save(record);
+        return record.getOriginalUrl();
     }
 }
