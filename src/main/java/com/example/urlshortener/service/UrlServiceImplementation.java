@@ -1,6 +1,7 @@
 package com.example.urlshortener.service;
 
 import com.example.urlshortener.exception.ShortUrlNotFoundException;
+import com.example.urlshortener.exception.UrlExpiredException;
 import com.example.urlshortener.repository.UrlRecordRepository;
 import com.example.urlshortener.util.ExpiryDuration;
 import java.time.LocalDateTime;
@@ -69,7 +70,7 @@ public class UrlServiceImplementation implements UrlService {
         var record = recordOptional.get();
 
         if (record.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Short URL has expired");
+            throw new UrlExpiredException("Short URL has expired");
         }
 
         // Increment the click count
