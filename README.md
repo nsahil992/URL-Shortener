@@ -1,47 +1,63 @@
 # URL Shortener – Spring Boot + PostgreSQL
 
-A production-style URL Shortener REST API built using Java, Spring Boot, Spring Data JPA, and PostgreSQL.
+A production-style **URL Shortener REST API** built using **Java, Spring Boot, Spring Data JPA, and PostgreSQL**.
 
 The application allows users to:
+
 - Create short links
 - Redirect using short codes
 - Track click analytics
 - Generate expiring URLs
 
-This project demonstrates backend design, REST API development, database modeling, and clean architecture.
+This project demonstrates:
+
+- Backend API design
+- Database modeling
+- Docker containerization
+- Kubernetes deployment
+- CI pipeline automation
 
 ---
 
-## Features
+# Features
 
-### Core Features
+## Core Features
+
 - Create short URLs from long URLs
 - Redirect using short code
 - PostgreSQL persistence
-- Clean layered architecture (Controller → Service → Repository)
+- Clean layered architecture
 
-### Advanced Features
-- Click count tracking (basic analytics)
+---
+
+## Advanced Features
+
 - URL expiry with selectable duration
-- Custom exception handling
+- Click count tracking (basic analytics)
 - DTO validation
+- Custom exception handling
 - Environment variable based configuration
 
 ---
 
-## Tech Stack
+# Tech Stack
 
 | Category | Technology |
-|-----------|------------|
-| Language | Java 23 |
+|--------|--------|
+| Language | Java 21 |
 | Framework | Spring Boot |
 | Database | PostgreSQL |
 | ORM | Spring Data JPA (Hibernate) |
 | Build Tool | Maven |
-| Validation | Jakarta Validation |
-| Architecture | REST API |
+| Containerization | Docker |
+| Orchestration | Kubernetes |
+| CI Pipeline | GitHub Actions |
 
 ---
+
+# Architecture
+
+![Architecture Diagram](./images/url-architecture.png)
 
 ## API Endpoints
 
@@ -101,6 +117,8 @@ Each redirect increments a click counter stored in the database.
 
 This demonstrates read-modify-write database operations and basic analytics tracking.
 
+![Postgres Data](./images/postgres-data.png)
+
 ---
 
 ## Project Structure
@@ -137,7 +155,24 @@ url-shortener
 │   └── UrlShortenerApplication.java
 │
 ├── src/main/resources
-│   └── application.yml
+│   ├── application.yml
+│   └── db/migration/schema.sql
+│
+├── k8s
+│   ├── namespace.yaml
+│   ├── url-shortener-deployment.yaml
+│   ├── url-shortener-service.yaml
+│   ├── postgres-deployment.yaml
+│   ├── postgres-service.yaml
+│   ├── postgres-pv.yaml
+│   └── postgres-pvc.yaml
+│
+├── docker-compose.yaml
+├── Dockerfile
+├── .github/workflows/ci.yml
+│
+├── images
+│   └── architecture.png
 │
 └── pom.xml
 ```
@@ -187,32 +222,60 @@ Application runs at:
 http://localhost:8081
 ```
 
+#### Run using Docker Compose:
+
+```
+docker compose up --build
+```
+
+Application runs at:
+
+```
+http://localhost:8081
+```
 ---
+
+# Kubernetes Deployment
+
+The application can be deployed to **Kubernetes (Minikube)**.
+
+The deployment includes the following components:
+
+- **Namespace** for isolating resources
+- **Spring Boot API Deployment**
+- **PostgreSQL Deployment**
+- **Kubernetes Services** for internal communication
+- **Secrets** for database credentials
+- **Persistent Volume (PV)** for database storage
+- **Persistent Volume Claim (PVC)** for persistent data
+
+---
+
+## Deploy the Application
+
+Apply all Kubernetes manifests:
+
+```bash
+kubectl apply -f k8s/
+```
+
+Access the application
+
+```bash
+kubectl port-forward svc/url-shortener-service 8081:80 -n url-shortener
+```
+
+The application will be available at:
+```bash
+http://localhost:8081
+```
 
 ## Future Improvements
 
 - Base62 encoding for short codes
 - Rate limiting
 - Redis caching
-- Dockerization and deployment on K8s
-- Adding CI/CD pipeling
 - User authentication using Spring Security
 - Adding tests
 
 ---
-
-## Learning Outcomes
-
-This project demonstrates:
-
-- REST API design using Spring Boot
-- Database schema design with JPA and ORM
-- Exception handling best practices
-- Environment-based configuration
-- Evolving an MVP into a production-style backend service
-
----
-
-## Author
-
-Sahil Naik
