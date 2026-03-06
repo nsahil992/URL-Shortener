@@ -3,8 +3,19 @@ name: CI Pipeline
 on:
   push:
     branches: [master]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'images/**'
+      - '.gitignore'
   pull_request:
     branches: [master]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'images/**'
+      - '.gitignore'
+
 
 jobs:
   build-test:
